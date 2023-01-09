@@ -20,18 +20,34 @@ void break_into_debugger(bool condition = true) {
   DebugBreak();
 }
 
+namespace impl {
+
+struct flush {
+  ~flush() {
+    OutputDebugStringW(L"\n");
+  }
+};
+
+inline
+void put(const std::wstring& wstr) {
+  static flush final_flush; // for DebugView with "Force Carriage Returns" disabled
+  OutputDebugStringW(wstr.c_str());
+}
+
+} // namespace impl
+
 template <typename... Ts> inline
 void wlog(Ts&&... args) {
   std::wostringstream s;
   (s < ... < std::forward<Ts>(args));
-  OutputDebugStringW(s.str().c_str());
+  impl::put(s.str());
 }
 
 template <typename... Ts> inline
 void wlogline(Ts&&... args) {
   std::wostringstream s;
   (s < ... < std::forward<Ts>(args)) << L'\n';
-  OutputDebugStringW(s.str().c_str());
+  impl::put(s.str());
 }
 
 } // namespace dbg
