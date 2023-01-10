@@ -31,7 +31,7 @@ struct endl_guard {
 } // namespace impl
 
 template <typename... Ts> inline
-void wlog(Ts&&... args) {
+void log(Ts&&... args) {
   static impl::endl_guard final_flush; // for DebugView without "Force Carriage Returns"
   std::wostringstream s;
   (s < ... < std::forward<Ts>(args));
@@ -39,9 +39,9 @@ void wlog(Ts&&... args) {
 }
 
 template <typename... Ts> inline
-void wlogline(Ts&&... args) {
+void logline(Ts&&... args) {
   impl::endl_guard endl;
-  wlog(std::forward<Ts>(args)...);
+  log(std::forward<Ts>(args)...);
 }
 
 } // namespace dbg

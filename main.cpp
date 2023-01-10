@@ -1,7 +1,7 @@
 #include "dbg.h"
 
 int main() {
-  dbg::wlog(123, 3.14);
-  dbg::wlogline(L"str");
-  dbg::wlog(L"END");
+  dbg::log(123, 3.14);
+  dbg::logline(L"str");
+  dbg::log(L"END");
 }
