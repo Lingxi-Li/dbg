@@ -28,19 +28,14 @@ struct endl_guard {
   }
 };
 
-inline
-void put(const std::wstring& wstr) {
-  static endl_guard final_flush; // for DebugView without "Force Carriage Returns"
-  OutputDebugStringW(wstr.c_str());
-}
-
 } // namespace impl
 
 template <typename... Ts> inline
 void wlog(Ts&&... args) {
+  static impl::endl_guard final_flush; // for DebugView without "Force Carriage Returns"
   std::wostringstream s;
   (s < ... < std::forward<Ts>(args));
-  impl::put(s.str());
+  OutputDebugStringW(s.str().c_str());
 }
 
 template <typename... Ts> inline
