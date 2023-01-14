@@ -32,7 +32,14 @@ struct endl_guard {
 
 template <typename... Ts> inline
 void log(Ts&&... args) {
-  static impl::endl_guard final_flush; // for DebugView without "Force Carriage Returns"
+  // In DebugView, '\n' triggers buffer flushing and
+  // causes text to be displayed. DebugView has a
+  // "Force Carriage Returns" option. It auto appends '\n'
+  // for each OutputDebugString call, which may not
+  // be what you want. The following static variable
+  // flushes the buffer at process termination
+  // regardless of the "Force Carriage Returns" option.
+  static impl::endl_guard final_flush;
   std::wostringstream s;
   (s < ... < std::forward<Ts>(args));
   OutputDebugStringW(s.str().c_str());
