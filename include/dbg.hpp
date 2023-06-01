@@ -17,7 +17,13 @@ inline void break_into_debugger(bool condition = true) {
     while (!IsDebuggerPresent()) {
         Sleep(3 * 1000);
     }
-    DebugBreak();
+    // Because `DebugBreak` is a call to a system function,
+    // system debug symbols must be installed to ensure the
+    // correct call stack information is displayed after breaking.
+    // Otherwise, the call stack information displayed by the
+    // debugger may be off by one frame. If you use `__debugbreak`,
+    // symbols are not required.
+    __debugbreak();
 }
 
 namespace impl {
