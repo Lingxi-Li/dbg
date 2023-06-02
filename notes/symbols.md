@@ -1,4 +1,6 @@
-# [Symbols](https://learn.microsoft.com/en-us/windows/win32/dxtecharts/debugging-with-symbols)
+# Symbols
+
+## Concepts
 
 - Windows uses PDB format symbols
 - Stripped PDB has no local variable, struct, and source code correlation info
@@ -16,3 +18,15 @@
     - Respected by all tools like VS, WinDbg
     - Syntax: `srv*[local cache]*[private symbol server]*[internet symbol server]`
 - Symbol server may further correlate with *source (code) server*
+
+## Set Up Debug Session
+
+- Set up WinDbg default source/symbol/cache path
+    - Use [AgeStore](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/agestore) to trim local cache
+- [`.sympath[+] [Path [; ...]]`](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/-sympath--set-symbol-path-)
+- `.reload /f`
+- `lm` and expect `private pdb symbols` next to each loaded module
+- To troubleshoot symbol loading ([wiki](https://www.osgwiki.com/wiki/WinDbg_102_-_Setting_up_WinDbg#Trouble_in_loading_private_symbols))
+    - `!sym noisy` enables symbol loading verbose output
+    - `.reload /f` again
+- [`.srcpath[+] [Directory [; ...]]`](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/-srcpath---lsrcpath--set-source-path-)
