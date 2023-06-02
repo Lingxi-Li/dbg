@@ -21,7 +21,9 @@
 
 ## Set Up Debug Session
 
-- Set up WinDbg default source/symbol/cache path
+- Set up WinDbg default source/symbol path
+- Specify local cache path with `cache*LocalPath` as first line in `Symbol path` box
+    - The `Default cache` setting DOES NOT work
     - Use [AgeStore](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/agestore) to trim local cache
 - [`.sympath[+] [Path [; ...]]`](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/-sympath--set-symbol-path-)
 - `.reload /f`
