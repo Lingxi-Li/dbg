@@ -1,5 +1,19 @@
 # WinDbg Commands
 
+## Data Model
+
+- [`dx [-g #]-r[#] Expression[,d#]`](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/dx--display-visualizer-variables-)
+- Root is `Debugger`
+- [Supports LINQ queries](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/using-linq-with-the-debugger-objects#supported-linq-syntax---query-methods)
+
+### Current Context
+
+- `@$cursession`
+- `@$curprocess`
+- `@$curthread`
+- `@$curstack`
+- `@$curframe`
+
 ## Live Debugging
 
 ### Stepping
