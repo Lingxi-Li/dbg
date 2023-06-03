@@ -1,5 +1,10 @@
 # WinDbg Commands
 
+### General
+
+- `.shell -ci "Command" findstr Key` (filter `Command` output)
+- `.time`
+
 ## Data Model
 
 - [`dx [-g #]-r[#] Expression[,d#]`](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/dx--display-visualizer-variables-)
@@ -29,6 +34,11 @@
 - `bm` (symbol pattern)
 - `bu` (break at point in module not loaded yet)
 - `ba [r|w|e] [Size] Address` (break at data access)
+
+### Thread
+
+- `!runaway 7`
+- `.ttime`
 
 ### Process
 
