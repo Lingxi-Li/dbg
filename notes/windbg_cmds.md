@@ -39,6 +39,7 @@
 
 - `!runaway 7`
 - `.ttime`
+- `~ThreadIndex s`
 
 ### Process
 
