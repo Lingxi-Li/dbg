@@ -2,6 +2,7 @@
 
 ### General
 
+- `x Module!Function` (global search for a symbol pattern)
 - `.shell -ci "Command" findstr Key` (filter `Command` output)
 - `.time`
 
