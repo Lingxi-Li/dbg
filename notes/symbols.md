@@ -31,4 +31,5 @@
 - To troubleshoot symbol loading ([wiki](https://www.osgwiki.com/wiki/WinDbg_102_-_Setting_up_WinDbg#Trouble_in_loading_private_symbols))
     - `!sym noisy` enables symbol loading verbose output
     - `.reload /f` again
+    - `Ctrl+Break` to abort symbol loading that takes too long
 - [`.srcpath[+] [Directory [; ...]]`](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/-srcpath---lsrcpath--set-source-path-)
