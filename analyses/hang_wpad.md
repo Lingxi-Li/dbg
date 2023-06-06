@@ -22,3 +22,16 @@ Located thread with index `27`.
 - Find time spent on waiting with<br>
 `.shell -ci "!runaway 7" findstr 27:`<br>
 Top to bottom are user-mode, kernel-mode, elapsed time. Time spent on waiting is (`elapsed time` - `user-mode time` - `kernel-mode time`)
+
+## Conclusion
+
+The issue is confirmed to be a WinHTTP bug. The `WinHttpAutoProxySvc` service has `AutoIdleShutdown` enabled by default and self shuts down when idle for 27 mins. At each start, the service registers a new explicit RPC endpoint. This does not work well when the service is hosted in a shared long-standing `svchost` process. Every single process can register at most 500 explicit RPC endpoints and the service would fail to start when having restarted for 500 times already in the shared `svchost` process. The bug is fixed in Windows Server 2022 ([release notes](https://support.microsoft.com/en-gb/topic/october-25-2022-kb5018485-os-build-20348-1194-preview-becf7d1a-9482-4d56-955d-097e35b992a4)). As the time of this writing, no plan to backport the fix to Windows Server 2019.
+
+The thread was stuck in waiting for service `WinHttpAutoProxySvc` that terminated unexpectedly to go up. When this essential service is down, all downstream threads would [get stuck](https://serverfault.com/a/762987). [Disabling WPAD](https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/disable-http-proxy-auth-features#how-to-disable-wpad) does not help as that requires the service be up and running in the first place.
+
+In the case of Docker container, `WinHttpAutoProxySvc` runs in a shared `svchost` process and would hit the issue. On host machine with 8G+ memory, the service always runs in its own dedicated `svchost` process that terminates with the service, and is therefore free of this issue.
+
+Potential mitigation includes
+
+1. regular OS restart to avoid reaching the 500 limit,
+2. regular WPAD workload (with less than 27 mins intermission) to keep the service busy.
