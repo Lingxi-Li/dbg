@@ -12,7 +12,7 @@ Application hangs for long within Web Proxy Auto Discovery (WPAD) code. WPAD is 
 - [The Old New Thing blog post](https://devblogs.microsoft.com/oldnewthing/20200501-00/?p=103720)
 - [Report on Dev Community](https://developercommunity.visualstudio.com/t/intermittent-and-indefinite-wcf-hang-blocking-requ/282756#T-N336412)
 
-## Analysis
+## Dump Analysis
 
 - First thing is to locate the thread running script task. Know that script task functions reside in `ST_`-prefixed namespace.<br>
 `dx @$curprocess.Threads.Where(t => t.Stack.Frames.Any(f => f.Attributes.SourceInformation.FunctionName.StartsWith("ST_")))`<br>
@@ -23,7 +23,7 @@ Located thread with index `27`.
 `.shell -ci "!runaway 7" findstr 27:`<br>
 Top to bottom are user-mode, kernel-mode, elapsed time. Time spent on waiting is (`elapsed time` - `user-mode time` - `kernel-mode time`)
 
-## Conclusion
+## Root Cause Analysis
 
 The issue is confirmed to be a WinHTTP bug. The `WinHttpAutoProxySvc` service has `AutoIdleShutdown` enabled by default and self shuts down when idle for 27 mins. At each start, the service registers a new explicit RPC endpoint. This does not work well when the service is hosted in a shared long-standing `svchost` process. Every single process can register at most 500 explicit RPC endpoints and the service would fail to start when having restarted for 500 times already in the shared `svchost` process. The bug is fixed in Windows Server 2022 ([release notes](https://support.microsoft.com/en-gb/topic/october-25-2022-kb5018485-os-build-20348-1194-preview-becf7d1a-9482-4d56-955d-097e35b992a4)). As the time of this writing, no plan to backport the fix to Windows Server 2019.
 
@@ -31,7 +31,17 @@ The thread was stuck in waiting for service `WinHttpAutoProxySvc` to start. When
 
 In the case of Docker container, `WinHttpAutoProxySvc` always runs in a shared `svchost` process and would hit the issue. On host machine with 8G+ memory, the service always runs in its own dedicated `svchost` process that terminates with the service, and is therefore free of this issue.
 
-Potential mitigations include
 
-1. regular OS restart to avoid reaching the 500 limit,
-2. regular WPAD workload (with less than 27 mins intermission) to keep the service busy.
+## Mitigation
+
+For container case, first-choice mitigation is to patch the base image with Dockerfile and have the service run in dedicated svchost. For example,
+
+~~~
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+RUN reg add HKLM\System\CurrentControlSet\Services\WinhttpAutoProxySvc /v Type /t REG_DWORD /d 0x10 /f
+~~~
+
+Other mitigations include
+
+1. schedule regular OS restart to avoid reaching the 500 limit,
+2. schedule regular WPAD workload (with less than 27 mins intermission) to keep the service busy.
