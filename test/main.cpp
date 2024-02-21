@@ -1,7 +1,7 @@
 #include <dbg.hpp>
 
 int main() {
-    dbg::log(123, 3.14);
-    dbg::logline(L"wstr", "str");
-    dbg::log(L"END");
+    dbg::logf(L"Attempt {}: {}", 1, L"Success");
+    dbg::loglinef(L"Attempt {}: {}", 1, L"Success");
+    dbg::logf(L"Attempt {}: {}", 1, L"Success");
 }

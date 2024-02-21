@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 
+#include <format>
 #include <sstream>
 #include <utility>
 
@@ -52,9 +53,21 @@ void log(Ts&&... args) {
 }
 
 template <typename... Ts>
+void logf(std::wformat_string<Ts...> fmt, Ts&&... args) {
+    auto msg = std::format(fmt, std::forward<Ts>(args)...);
+    log(msg);
+}
+
+template <typename... Ts>
 void logline(Ts&&... args) {
     impl::endl_guard endl;
     log(std::forward<Ts>(args)...);
+}
+
+template <typename... Ts>
+void loglinef(std::wformat_string<Ts...> fmt, Ts&&... args) {
+    auto msg = std::format(fmt, std::forward<Ts>(args)...);
+    logline(msg);
 }
 
 } // namespace dbg
